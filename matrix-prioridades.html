@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <title>Matriz de Prioridade</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+      background: #f9f9f9;
+      transition: background 0.3s, color 0.3s;
+    }
+    .dark-mode {
+      background: #1f1f1f;
+      color: #f1f1f1;
+    }
+    h2 {
+      color: inherit;
+      text-align: center;
+    }
+    .matrix-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-top: 30px;
+    }
+    .section {
+      flex: 1;
+    }
+    .section label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .buttons-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .buttons-container button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-align: left;
+      background-color: #e0e0e0;
+      color: #000;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .selected {
+      /* só a classe para facilitar, as cores serão definidas no JS */
+    }
+    #resultado, #detalhes {
+      margin-top: 30px;
+      font-size: 1.4em;
+      font-weight: bold;
+      background: #e6f4ee;
+      padding: 10px;
+      border-radius: 5px;
+      color: #2a7f62;
+      text-align: center;
+      transition: background 0.3s, color 0.3s;
+    }
+    .dark-mode #resultado, .dark-mode #detalhes {
+      background: #2a7f62;
+      color: #e6f4ee;
+    }
+    .controls {
+      text-align: center;
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      align-items: center;
+    }
+    input[type="date"] {
+      padding: 5px;
+      margin-top: 15px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    select, input[type="color"], button {
+      font-size: 1em;
+      padding: 7px 12px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    select {
+      min-width: 140px;
+    }
+    input[type="color"] {
+      width: 45px;
+      height: 30px;
+      padding: 0;
+      border: none;
+    }
+    .dark-mode select, .dark-mode input[type="color"], .dark-mode button {
+      border-color: #555;
+      background-color: #2a2a2a;
+      color: #eee;
+    }
+  </style>
+</head>
+<body class="dark-mode">
+  <h2 id="titulo">Matriz de Prioridade</h2>
+
+  <div class="matrix-container">
+    <div class="section">
+      <label id="labelPrazo">Prazo:</label>
+      <div class="buttons-container" id="prazoBtns"></div>
+      <input type="date" id="dataPrazo" />
+    </div>
+
+    <div class="section">
+      <label id="labelPressao">Pressão Externa:</label>
+      <div class="buttons-container" id="pressaoBtns"></div>
+    </div>
+
+    <div class="section">
+      <label id="labelUrgencia">Urgência:</label>
+      <div class="buttons-container" id="urgenciaBtns"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <select id="seletorLingua" title="Selecione língua / Select language">
+      <option value="pt">Português</option>
+      <option value="en">English</option>
+    </select>
+
+    <button id="btnReiniciar">Reiniciar</button>
+    <button id="btnModo">Modo Claro/Escuro</button>
+
+    <input type="color" id="seletorCor" title="Selecionar cor / Select color" value="#FFDB58" />
+  </div>
+
+  <div id="detalhes">P1 E1 U1</div>
+  <div id="resultado">Pontuação: 1</div>
+
+  <script>
+    const textos = {
+      pt: {
+        titulo: "Matriz de Prioridade",
+        prazo: [
+          "Mais de 8 Semanas ou Sem Prazo",
+          "Entre 4 e 8 Semanas",
+          "Entre 2 e 4 Semanas",
+          "Entre 1 e 2 Semanas",
+          "Expirada ou menos de 1 Semana"
+        ],
+        pressao: [
+          "Sem pressão",
+          "Pessoal",
+          "Amigo/ Colega",
+          "Familiar/ Colega Direto ou Superior",
+          "Chefia/ Autoridade/ Comunidade/ Eventos"
+        ],
+        urgencia: [
+          "Pode esperar",
+          "Pouco urgente",
+          "Urgente, merece atenção no curto prazo",
+          "Muito urgente",
+          "Necessidade de ação imediata"
+        ],
+        reiniciar: "Reiniciar",
+        modo: "Modo Claro/Escuro",
+        pontuacao: "Pontuação"
+      },
+      en: {
+        titulo: "Priority Matrix",
+        prazo: [
+          "More than 8 weeks or no deadline",
+          "Between 4 and 8 weeks",
+          "Between 2 and 4 weeks",
+          "Between 1 and 2 weeks",
+          "Expired or less than 1 week"
+        ],
+        pressao: [
+          "No pressure",
+          "Personal",
+          "Friend/Colleague",
+          "Family/Direct Colleague or Superior",
+          "Boss/Authority/Community/Events"
+        ],
+        urgencia: [
+          "Can wait",
+          "Little urgent",
+          "Urgent, needs short-term attention",
+          "Very urgent",
+          "Immediate action needed"
+        ],
+        reiniciar: "Reset",
+        modo: "Light/Dark Mode",
+        pontuacao: "Score"
+      }
+    };
+
+    let linguagem = "pt";
+    let corAtual = "#FFDB58";
+    let valores = { prazo: 1, pressao: 1, urgencia: 1 };
+
+    const seletorLingua = document.getElementById("seletorLingua");
+    const seletorCor = document.getElementById("seletorCor");
+    const btnReiniciar = document.getElementById("btnReiniciar");
+    const btnModo = document.getElementById("btnModo");
+
+    function ehCorEscura(hex) {
+      const c = hex.substring(1); // remove #
+      const rgb = parseInt(c, 16);
+      const r = (rgb >> 16) & 0xff;
+      const g = (rgb >> 8) & 0xff;
+      const b = rgb & 0xff;
+      // luminance formula
+      const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      return luma < 128;
+    }
+
+    function criarBotoes(id, categoria) {
+      const container = document.getElementById(id);
+      container.innerHTML = "";
+      textos[linguagem][categoria].forEach((texto, i) => {
+        const btn = document.createElement("button");
+        btn.textContent = `${i + 1} - ${texto}`;
+        btn.onclick = () => selecionarValor(categoria, i + 1, btn);
+        btn.style.backgroundColor = "#e0e0e0";
+        btn.style.color = "#000";
+        container.appendChild(btn);
+      });
+    }
+
+    function selecionarValor(categoria, valor, botao) {
+      valores[categoria] = valor;
+      const container = botao.parentNode;
+      [...container.children].forEach((b) => {
+        b.classList.remove("selected");
+        b.style.backgroundColor = "#e0e0e0";
+        b.style.color = "#000";
+      });
+      botao.classList.add("selected");
+
+      const escuro = ehCorEscura(corAtual);
+      botao.style.backgroundColor = corAtual;
+      botao.style.color = escuro ? "#fff" : "#000";
+
+      atualizarResultado();
+    }
+
+    function atualizarResultado() {
+      const total = valores.prazo * valores.pressao * valores.urgencia;
+      const textoPontuacao = linguagem === "pt" ? "Pontuação" : "Score";
+      const escuro = ehCorEscura(corAtual);
+
+      document.getElementById("resultado").textContent = `${textoPontuacao}: ${total}`;
+      document.getElementById("resultado").style.backgroundColor = corAtual;
+      document.getElementById("resultado").style.color = escuro ? "#fff" : "#000";
+
+      document.getElementById(
+        "detalhes"
+      ).textContent = `P${valores.prazo} E${valores.pressao} U${valores.urgencia}`;
+      document.getElementById("detalhes").style.backgroundColor = corAtual;
+      document.getElementById("detalhes").style.color = escuro ? "#fff" : "#000";
+    }
+
+    function reiniciar() {
+      valores = { prazo: 1, pressao: 1, urgencia: 1 };
+      criarBotoes("prazoBtns", "prazo");
+      criarBotoes("pressaoBtns", "pressao");
+      criarBotoes("urgenciaBtns", "urgencia");
+
+      // selecionar primeiro botão de cada grupo
+      const prazoBtns = document.getElementById("prazoBtns").children;
+      selecionarValor("prazo", 1, prazoBtns[0]);
+      const pressaoBtns = document.getElementById("pressaoBtns").children;
+      selecionarValor("pressao", 1, pressaoBtns[0]);
+      const urgenciaBtns = document.getElementById("urgenciaBtns").children;
+      selecionarValor("urgencia", 1, urgenciaBtns[0]);
+
+      // limpar data prazo
+      document.getElementById("dataPrazo").value = "";
+
+      atualizarResultado();
+    }
+
+    function alternarModo() {
+      document.body.classList.toggle("dark-mode");
+    }
+
+    function traduzir() {
+      document.getElementById("titulo").textContent = textos[linguagem].titulo;
+      document.getElementById("labelPrazo").textContent = linguagem === "pt" ? "Prazo:" : "Deadline:";
+      document.getElementById("labelPressao").textContent = linguagem === "pt" ? "Pressão Externa:" : "External Pressure:";
+      document.getElementById("labelUrgencia").textContent = linguagem === "pt" ? "Urgência:" : "Urgency:";
+      btnReiniciar.textContent = textos[linguagem].reiniciar;
+      btnModo.textContent = textos[linguagem].modo;
+
+      // recriar botoes com a nova linguagem
+      criarBotoes("prazoBtns", "prazo");
+      criarBotoes("pressaoBtns", "pressao");
+      criarBotoes("urgenciaBtns", "urgencia");
+
+      // selecionar os valores atuais nas novas listas
+      const prazoBtns = document.getElementById("prazoBtns").children;
+      selecionarValor("prazo", valores.prazo, prazoBtns[valores.prazo - 1]);
+      const pressaoBtns = document.getElementById("pressaoBtns").children;
+      selecionarValor("pressao", valores.pressao, pressaoBtns[valores.pressao - 1]);
+      const urgenciaBtns = document.getElementById("urgenciaBtns").children;
+      selecionarValor("urgencia", valores.urgencia, urgenciaBtns[valores.urgencia - 1]);
+
+      atualizarResultado();
+    }
+
+    function atualizarCor() {
+      corAtual = seletorCor.value;
+
+      // atualizar cor dos botões selecionados
+      ["prazoBtns", "pressaoBtns", "urgenciaBtns"].forEach((id) => {
+        const container = document.getElementById(id);
+        [...container.children].forEach((btn) => {
+          if (btn.classList.contains("selected")) {
+            const escuro = ehCorEscura(corAtual);
+            btn.style.backgroundColor = corAtual;
+            btn.style.color = escuro ? "#fff" : "#000";
+          } else {
+            btn.style.backgroundColor = "#e0e0e0";
+            btn.style.color = "#000";
+          }
+        });
+      });
+
+      // atualizar cor resultado e detalhes
+      atualizarResultado();
+
+      // atualizar cor dos botões reiniciar e modo
+      const escuro = ehCorEscura(corAtual);
+      btnReiniciar.style.backgroundColor = corAtual;
+      btnReiniciar.style.color = escuro ? "#fff" : "#000";
+      btnModo.style.backgroundColor = corAtual;
+      btnModo.style.color = escuro ? "#fff" : "#000";
+    }
+
+    // Eventos
+    seletorLingua.addEventListener("change", (e) => {
+      linguagem = e.target.value;
+      traduzir();
+    });
+    seletorCor.addEventListener("input", atualizarCor);
+    btnReiniciar.addEventListener("click", reiniciar);
+    btnModo.addEventListener("click", () => {
+      alternarModo();
+      // atualizar cor, pois modo escuro pode alterar visibilidade
+      atualizarCor();
+    });
+
+    // Início
+    reiniciar();
+    traduzir();
+    atualizarCor();
+
+    // Data prazo automático (não alterado, mantém-se do que já fizeste)
+   document.getElementById("dataPrazo").addEventListener("change", (e) => {
+  const data = e.target.value;
+  if (!data) return;
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  const alvo = new Date(data);
+  alvo.setHours(0, 0, 0, 0);
+  const dias = Math.ceil((alvo - hoje) / (1000 * 60 * 60 * 24));
+
+  let nivel = 1;
+  if (dias <= 7) nivel = 5;
+  else if (dias <= 14) nivel = 4;
+  else if (dias <= 28) nivel = 3;
+  else if (dias <= 56) nivel = 2;
+  else nivel = 1;
+
+  valores.prazo = nivel;
+  const botoes = document.getElementById("prazoBtns").children;
+  const escuro = ehCorEscura(corAtual);
+  for (let i = 0; i < botoes.length; i++) {
+    botoes[i].classList.remove("selected");
+    botoes[i].style.backgroundColor = "#e0e0e0";
+    botoes[i].style.color = "#000";
+  }
+  botoes[nivel - 1].classList.add("selected");
+  botoes[nivel - 1].style.backgroundColor = corAtual;
+  botoes[nivel - 1].style.color = escuro ? "#fff" : "#000";
+
+  atualizarResultado();
+});
+  </script>
+</body>
+</html>
