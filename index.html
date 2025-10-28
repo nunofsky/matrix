@@ -121,7 +121,7 @@
     </div>
 
     <div class="section">
-      <label id="labelUrgencia">Urgência:</label>
+      <label id="labelUrgencia">Duração:</label>
       <div class="buttons-container" id="urgenciaBtns"></div>
     </div>
   </div>
@@ -138,7 +138,7 @@
     <input type="color" id="seletorCor" title="Selecionar cor / Select color" value="#FFDB58" />
   </div>
 
-  <div id="detalhes">P1 E1 U1</div>
+  <div id="detalhes">P1 E1 D1</div>
   <div id="resultado">Pontuação: 1</div>
 
   <script>
@@ -160,11 +160,11 @@
           "Chefia/ Autoridade/ Comunidade/ Eventos"
         ],
         urgencia: [
-          "Pode esperar",
-          "Pouco urgente",
-          "Urgente, merece atenção no curto prazo",
-          "Muito urgente",
-          "Necessidade de ação imediata"
+          "Mais de 4 horas",
+          "Entre 90 minutos e 4 horas",
+          "Entre 30 e 90 minutos",
+          "Entre 5 e 30 minutos",
+          "Menos de 5 minutos"
         ],
         reiniciar: "Reiniciar",
         modo: "Modo Claro/Escuro",
@@ -187,11 +187,11 @@
           "Boss/Authority/Community/Events"
         ],
         urgencia: [
-          "Can wait",
-          "Little urgent",
-          "Urgent, needs short-term attention",
-          "Very urgent",
-          "Immediate action needed"
+          "More than 4 hours",
+          "Between 90 minutes and 4 hours",
+          "Between 30 and 90 minutes",
+          "Between 5 and 30 minutes",
+          "Less than 5 minutes"
         ],
         reiniciar: "Reset",
         modo: "Light/Dark Mode",
@@ -260,7 +260,7 @@
 
       document.getElementById(
         "detalhes"
-      ).textContent = `P${valores.prazo} E${valores.pressao} U${valores.urgencia}`;
+      ).textContent = `P${valores.prazo} E${valores.pressao} D${valores.urgencia}`;
       document.getElementById("detalhes").style.backgroundColor = corAtual;
       document.getElementById("detalhes").style.color = escuro ? "#fff" : "#000";
     }
@@ -293,7 +293,7 @@
       document.getElementById("titulo").textContent = textos[linguagem].titulo;
       document.getElementById("labelPrazo").textContent = linguagem === "pt" ? "Prazo:" : "Deadline:";
       document.getElementById("labelPressao").textContent = linguagem === "pt" ? "Pressão Externa:" : "External Pressure:";
-      document.getElementById("labelUrgencia").textContent = linguagem === "pt" ? "Urgência:" : "Urgency:";
+      document.getElementById("labelUrgencia").textContent = linguagem === "pt" ? "Duração:" : "Duration:";
       btnReiniciar.textContent = textos[linguagem].reiniciar;
       btnModo.textContent = textos[linguagem].modo;
 
