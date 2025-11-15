@@ -124,6 +124,11 @@
       <label id="labelUrgencia">Duração:</label>
       <div class="buttons-container" id="urgenciaBtns"></div>
     </div>
+
+    <div class="section">
+      <label id="labelImportancia">Importância:</label>
+      <div class="buttons-container" id="importanciaBtns"></div>
+    </div>
   </div>
 
   <div class="controls">
@@ -138,7 +143,7 @@
     <input type="color" id="seletorCor" title="Selecionar cor / Select color" value="#FFDB58" />
   </div>
 
-  <div id="detalhes">P1 E1 D1</div>
+  <div id="detalhes">P1 E1 D1 I1</div>
   <div id="resultado">Pontuação: 1</div>
 
   <script>
@@ -153,18 +158,25 @@
           "Expirada ou menos de 1 Semana"
         ],
         pressao: [
-          "Sem pressão",
-          "Pessoal",
-          "Amigo/ Colega",
-          "Familiar/ Colega Direto ou Superior",
-          "Chefia/ Autoridade/ Comunidade/ Eventos"
+          "Sem Pressão",
+          "Pessoal/ Colega",
+          "Amigo/ Coordenação",
+          "Familiar/ Chefia",
+          "Autoridade/ Direção"
         ],
         urgencia: [
-          "Mais de 4 horas",
-          "Entre 90 minutos e 4 horas",
-          "Entre 30 e 90 minutos",
-          "Entre 5 e 30 minutos",
-          "Menos de 5 minutos"
+          "Mais de 4h",
+          "Entre 90m e 4h",
+          "Entre 30m e 90m",
+          "Entre 15m e 30m",
+          "Menos de 15m"
+        ],
+        importancia: [
+          "Pessoal",
+          "Organiza",
+          "Desbloqueia",
+          "Responsabilidade",
+          "Impacto Externo"
         ],
         reiniciar: "Reiniciar",
         modo: "Modo Claro/Escuro",
@@ -181,17 +193,24 @@
         ],
         pressao: [
           "No pressure",
-          "Personal",
-          "Friend/Colleague",
-          "Family/Direct Colleague or Superior",
-          "Boss/Authority/Community/Events"
+          "Personal/ Colleague",
+          "Friend/ Coordination",
+          "Family/ Boss",
+          "Authority/ Management"
         ],
         urgencia: [
-          "More than 4 hours",
-          "Between 90 minutes and 4 hours",
-          "Between 30 and 90 minutes",
-          "Between 5 and 30 minutes",
-          "Less than 5 minutes"
+          "More than 4h",
+          "Between 90m and 4h",
+          "Between 30m and 90m",
+          "Between 15m and 30m",
+          "Less than 15m"
+        ],
+        importancia: [
+          "Personal",
+          "Organize",
+          "Unblocks",
+          "Responsibility",
+          "External Impact"
         ],
         reiniciar: "Reset",
         modo: "Light/Dark Mode",
@@ -201,7 +220,7 @@
 
     let linguagem = "pt";
     let corAtual = "#FFDB58";
-    let valores = { prazo: 1, pressao: 1, urgencia: 1 };
+    let valores = { prazo: 1, pressao: 1, urgencia: 1, importancia: 1 };
 
     const seletorLingua = document.getElementById("seletorLingua");
     const seletorCor = document.getElementById("seletorCor");
@@ -250,7 +269,7 @@
     }
 
     function atualizarResultado() {
-      const total = valores.prazo * valores.pressao * valores.urgencia;
+      const total = valores.prazo * valores.pressao * valores.urgencia * valores.importancia;
       const textoPontuacao = linguagem === "pt" ? "Pontuação" : "Score";
       const escuro = ehCorEscura(corAtual);
 
@@ -260,16 +279,17 @@
 
       document.getElementById(
         "detalhes"
-      ).textContent = `P${valores.prazo} E${valores.pressao} D${valores.urgencia}`;
+      ).textContent = `P${valores.prazo} E${valores.pressao} D${valores.urgencia} I${valores.importancia}`;
       document.getElementById("detalhes").style.backgroundColor = corAtual;
       document.getElementById("detalhes").style.color = escuro ? "#fff" : "#000";
     }
 
     function reiniciar() {
-      valores = { prazo: 1, pressao: 1, urgencia: 1 };
+      valores = { prazo: 1, pressao: 1, urgencia: 1, importancia: 1 };
       criarBotoes("prazoBtns", "prazo");
       criarBotoes("pressaoBtns", "pressao");
       criarBotoes("urgenciaBtns", "urgencia");
+      criarBotoes("importanciaBtns", "importancia");
 
       // selecionar primeiro botão de cada grupo
       const prazoBtns = document.getElementById("prazoBtns").children;
@@ -278,6 +298,8 @@
       selecionarValor("pressao", 1, pressaoBtns[0]);
       const urgenciaBtns = document.getElementById("urgenciaBtns").children;
       selecionarValor("urgencia", 1, urgenciaBtns[0]);
+      const importanciaBtns = document.getElementById("importanciaBtns").children;
+      selecionarValor("importancia", 1, importanciaBtns[0]);
 
       // limpar data prazo
       document.getElementById("dataPrazo").value = "";
@@ -294,6 +316,7 @@
       document.getElementById("labelPrazo").textContent = linguagem === "pt" ? "Prazo:" : "Deadline:";
       document.getElementById("labelPressao").textContent = linguagem === "pt" ? "Pressão Externa:" : "External Pressure:";
       document.getElementById("labelUrgencia").textContent = linguagem === "pt" ? "Duração:" : "Duration:";
+      document.getElementById("labelImportancia").textContent = linguagem === "pt" ? "Importância:" : "Importance:";
       btnReiniciar.textContent = textos[linguagem].reiniciar;
       btnModo.textContent = textos[linguagem].modo;
 
@@ -301,6 +324,7 @@
       criarBotoes("prazoBtns", "prazo");
       criarBotoes("pressaoBtns", "pressao");
       criarBotoes("urgenciaBtns", "urgencia");
+      criarBotoes("importanciaBtns", "importancia");
 
       // selecionar os valores atuais nas novas listas
       const prazoBtns = document.getElementById("prazoBtns").children;
@@ -309,6 +333,8 @@
       selecionarValor("pressao", valores.pressao, pressaoBtns[valores.pressao - 1]);
       const urgenciaBtns = document.getElementById("urgenciaBtns").children;
       selecionarValor("urgencia", valores.urgencia, urgenciaBtns[valores.urgencia - 1]);
+      const importanciaBtns = document.getElementById("importanciaBtns").children;
+      selecionarValor("importancia", valores.importancia, importanciaBtns[valores.importancia - 1]);
 
       atualizarResultado();
     }
@@ -317,7 +343,7 @@
       corAtual = seletorCor.value;
 
       // atualizar cor dos botões selecionados
-      ["prazoBtns", "pressaoBtns", "urgenciaBtns"].forEach((id) => {
+      ["prazoBtns", "pressaoBtns", "urgenciaBtns", "importanciaBtns"].forEach((id) => {
         const container = document.getElementById(id);
         [...container.children].forEach((btn) => {
           if (btn.classList.contains("selected")) {
